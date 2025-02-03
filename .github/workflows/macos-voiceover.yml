@@ -1,4 +1,4 @@
-name: MacOS VoiceOver
+name: MacOS VoiceOver for mac0s-15
 
 on: workflow_dispatch
 
@@ -8,7 +8,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [macos-13, macos-14, macos-15, macos-15-large, macos-15-xlarge]
+        os: [macos-13, macos-14, macos-15]
     steps:
       - uses: actions/checkout@v3
       - run: |
