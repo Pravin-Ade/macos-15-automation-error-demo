@@ -1,6 +1,7 @@
-name: MacOS VoiceOver for mac0s-15
+name: MacOS VoiceOver for macOS-15
 
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
 
 jobs:
   start-voiceover-and-move-right:
@@ -9,15 +10,17 @@ jobs:
     strategy:
       matrix:
         os: [macos-13, macos-14, macos-15]
-    steps:
-    
-      - uses: actions/checkout@v3
 
-       # check SIP status
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Check SIP status
       - name: Check System Integrity Protection (SIP) status
         run: |
           echo "Checking System Integrity Protection (SIP) status..."
-          sip_status=$(csrutil status)
+          sip_status=$(csrutil status || echo "unknown")
+
           echo "SIP Status: $sip_status"
           
           if echo "$sip_status" | grep -Eq "System Integrity Protection status: (disabled|unknown)"; then
@@ -27,44 +30,47 @@ jobs:
             exit 1
           fi
 
-      - name: older path 
+      - name: Check Older Path
         run: |
-          cd ~/Library/Preferences/com.apple.VoiceOver4/
-          ls -l
+          ls -l ~/Library/Preferences/com.apple.VoiceOver4/ || echo "Directory not found"
 
-          
-          # Disable splash screen
+      - name: Disable VoiceOver Splash Screen
+        run: |
           defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
+          echo "Splash screen disabled."
 
-          sleep 1
-
-          # Start VoiceOver
+      - name: Start VoiceOver
+        run: |
           /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
+          sleep 2
+          ps aux | grep "[V]oiceOver" || echo "VoiceOver process not found"
 
-          # See if VoiceOver process is running
-          ps aux | egrep "[V]oiceOver"
+      - name: Check if VoiceOver is Running
+        run: |
+          /usr/bin/osascript voiceOverRunning.applescript || echo "AppleScript check failed"
 
-          # # See if AppleScript thinks VoiceOver is running
-          /usr/bin/osascript voiceOverRunning.applescript
-          
-          sleep 1
-
-          # Use AppleScript to "activate" VoiceOver
-          until $(/usr/bin/osascript voiceOverActivate.applescript)
-          do
-            echo "VO not ready..."
+      - name: Activate VoiceOver
+        run: |
+          until /usr/bin/osascript voiceOverActivate.applescript; do
+            echo "Waiting for VoiceOver activation..."
             sleep 1
           done
-          echo "VO ready."
+          echo "VoiceOver activated."
 
-          # Attempt to control VoiceOver using AppleScript
-          until $(/usr/bin/osascript voiceOverPerform.applescript)
-          do
+      - name: Perform VoiceOver Actions
+        run: |
+          until /usr/bin/osascript voiceOverPerform.applescript; do
             echo "Failed to perform AppleScript, retrying..."
             sleep 1
           done
+          echo "VoiceOver interaction complete."
 
-          echo "Complete."
-
-          # Terminate VoiceOver
-          kill -15 $(ps aux | egrep "[V]oiceOver.app/Contents/MacOS/VoiceOver launchd -s" | awk '{print $2}')
+      - name: Terminate VoiceOver
+        run: |
+          pid=$(pgrep -f "VoiceOver.app/Contents/MacOS/VoiceOver")
+          if [ -n "$pid" ]; then
+            echo "Terminating VoiceOver (PID: $pid)"
+            kill -15 "$pid"
+          else
+            echo "VoiceOver process not found."
+          fi
