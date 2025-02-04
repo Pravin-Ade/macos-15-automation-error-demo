@@ -11,9 +11,18 @@ jobs:
         os: [macos-15]
     steps:
       - uses: actions/checkout@v3
-      - run: |
 
-          echo "hello! world"
+      - name: older path 
+        run: |
+          cd ~/Library/Preferences/com.apple.VoiceOver4/
+          ls -l
+
+      - name: sandbox path
+        run: |
+          cd ~/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+          ls -l
+
+          
           # # Disable splash screen
           # defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
 
