@@ -15,16 +15,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Check Older Path
-        run: |
-          ls -l ~/Library/Preferences/com.apple.VoiceOver4/ || echo "Directory not found"
-
-      - name: move to new sandboxed path
-        run: |
-         mkdir -p ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4 && \
-         mv -v ~/Library/Preferences/com.apple.VoiceOver4/default.plist ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-
-
       - name: Disable VoiceOver Splash Screen
         run: |
           defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
