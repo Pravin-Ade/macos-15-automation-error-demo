@@ -12,38 +12,40 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          # Disable splash screen
-          defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
 
-          sleep 1
+          echo "hello! world"
+          # # Disable splash screen
+          # defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
 
-          # Start VoiceOver
-          /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
+          # sleep 1
 
-          # See if VoiceOver process is running
-          ps aux | egrep "[V]oiceOver"
+          # # Start VoiceOver
+          # /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
 
-          # # See if AppleScript thinks VoiceOver is running
-          /usr/bin/osascript voiceOverRunning.applescript
+          # # See if VoiceOver process is running
+          # ps aux | egrep "[V]oiceOver"
+
+          # # # See if AppleScript thinks VoiceOver is running
+          # /usr/bin/osascript voiceOverRunning.applescript
           
-          sleep 1
+          # sleep 1
 
-          # Use AppleScript to "activate" VoiceOver
-          until $(/usr/bin/osascript voiceOverActivate.applescript)
-          do
-            echo "VO not ready..."
-            sleep 1
-          done
-          echo "VO ready."
-
-          # # Attempt to control VoiceOver using AppleScript
-          # until $(/usr/bin/osascript voiceOverPerform.applescript)
+          # # Use AppleScript to "activate" VoiceOver
+          # until $(/usr/bin/osascript voiceOverActivate.applescript)
           # do
-          #   echo "Failed to perform AppleScript, retrying..."
+          #   echo "VO not ready..."
           #   sleep 1
           # done
+          # echo "VO ready."
 
-          # echo "Complete."
+          # # # Attempt to control VoiceOver using AppleScript
+          # # until $(/usr/bin/osascript voiceOverPerform.applescript)
+          # # do
+          # #   echo "Failed to perform AppleScript, retrying..."
+          # #   sleep 1
+          # # done
 
-          # # Terminate VoiceOver
-          # kill -15 $(ps aux | egrep "[V]oiceOver.app/Contents/MacOS/VoiceOver launchd -s" | awk '{print $2}')
+          # # echo "Complete."
+
+          # # # Terminate VoiceOver
+          # # kill -15 $(ps aux | egrep "[V]oiceOver.app/Contents/MacOS/VoiceOver launchd -s" | awk '{print $2}')
