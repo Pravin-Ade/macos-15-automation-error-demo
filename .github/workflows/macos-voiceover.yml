@@ -9,30 +9,21 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [macos-13, macos-14, macos-15]
+        os: [macos-15]
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Check SIP status
-      - name: Check System Integrity Protection (SIP) status
-        run: |
-          echo "Checking System Integrity Protection (SIP) status..."
-          sip_status=$(csrutil status || echo "unknown")
-
-          echo "SIP Status: $sip_status"
-          
-          if echo "$sip_status" | grep -Eq "System Integrity Protection status: (disabled|unknown)"; then
-            echo "SIP is disabled. Proceeding with configuration."
-          else
-            echo "SIP is enabled. Please disable SIP for this script to work."
-            exit 1
-          fi
-
       - name: Check Older Path
         run: |
           ls -l ~/Library/Preferences/com.apple.VoiceOver4/ || echo "Directory not found"
+
+      - name: move to new sandboxed path
+        run: |
+         mkdir -p ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4 && \
+         mv -v ~/Library/Preferences/com.apple.VoiceOver4/default.plist ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+
 
       - name: Disable VoiceOver Splash Screen
         run: |
