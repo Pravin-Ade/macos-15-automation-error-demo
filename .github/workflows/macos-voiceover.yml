@@ -10,7 +10,22 @@ jobs:
       matrix:
         os: [macos-13, macos-14, macos-15]
     steps:
+    
       - uses: actions/checkout@v3
+
+       # check SIP status
+      - name: Check System Integrity Protection (SIP) status
+        run: |
+          echo "Checking System Integrity Protection (SIP) status..."
+          sip_status=$(csrutil status)
+          echo "SIP Status: $sip_status"
+          
+          if echo "$sip_status" | grep -Eq "System Integrity Protection status: (disabled|unknown)"; then
+            echo "SIP is disabled. Proceeding with configuration."
+          else
+            echo "SIP is enabled. Please disable SIP for this script to work."
+            exit 1
+          fi
 
       - name: older path 
         run: |
@@ -18,6 +33,7 @@ jobs:
           ls -l
 
       - name: sandbox path
+        continue-on-error: true
         run: |
           cd ~/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
           ls -l
