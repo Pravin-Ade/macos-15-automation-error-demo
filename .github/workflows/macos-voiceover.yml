@@ -32,12 +32,6 @@ jobs:
           cd ~/Library/Preferences/com.apple.VoiceOver4/
           ls -l
 
-      - name: sandbox path
-        continue-on-error: true
-        run: |
-          cd ~/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-          ls -l
-
           
           # Disable splash screen
           defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
