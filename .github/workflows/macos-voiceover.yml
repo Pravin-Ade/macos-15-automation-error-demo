@@ -9,7 +9,7 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [macos-15]
+        os: [macos-15, macos-13, macos-14]
 
     steps:
       - name: Checkout Repository
