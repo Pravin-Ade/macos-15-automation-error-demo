@@ -12,46 +12,48 @@ jobs:
         os: [macos-15, macos-13, macos-14]
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      # - name: Checkout Repository
+          run: df -h
+          
+      #   uses: actions/checkout@v3
 
-      - name: Disable VoiceOver Splash Screen
-        run: |
-          defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
-          echo "Splash screen disabled."
+      # - name: Disable VoiceOver Splash Screen
+      #   run: |
+      #     defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
+      #     echo "Splash screen disabled."
 
-      - name: Start VoiceOver
-        run: |
-          /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
-          sleep 2
-          ps aux | grep "[V]oiceOver" || echo "VoiceOver process not found"
+      # - name: Start VoiceOver
+      #   run: |
+      #     /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
+      #     sleep 2
+      #     ps aux | grep "[V]oiceOver" || echo "VoiceOver process not found"
 
-      - name: Check if VoiceOver is Running
-        run: |
-          /usr/bin/osascript voiceOverRunning.applescript || echo "AppleScript check failed"
+      # - name: Check if VoiceOver is Running
+      #   run: |
+      #     /usr/bin/osascript voiceOverRunning.applescript || echo "AppleScript check failed"
 
-      - name: Activate VoiceOver
-        run: |
-          until /usr/bin/osascript voiceOverActivate.applescript; do
-            echo "Waiting for VoiceOver activation..."
-            sleep 1
-          done
-          echo "VoiceOver activated."
+      # - name: Activate VoiceOver
+      #   run: |
+      #     until /usr/bin/osascript voiceOverActivate.applescript; do
+      #       echo "Waiting for VoiceOver activation..."
+      #       sleep 1
+      #     done
+      #     echo "VoiceOver activated."
 
-      - name: Perform VoiceOver Actions
-        run: |
-          until /usr/bin/osascript voiceOverPerform.applescript; do
-            echo "Failed to perform AppleScript, retrying..."
-            sleep 1
-          done
-          echo "VoiceOver interaction complete."
+      # - name: Perform VoiceOver Actions
+      #   run: |
+      #     until /usr/bin/osascript voiceOverPerform.applescript; do
+      #       echo "Failed to perform AppleScript, retrying..."
+      #       sleep 1
+      #     done
+      #     echo "VoiceOver interaction complete."
 
-      - name: Terminate VoiceOver
-        run: |
-          pid=$(pgrep -f "VoiceOver.app/Contents/MacOS/VoiceOver")
-          if [ -n "$pid" ]; then
-            echo "Terminating VoiceOver (PID: $pid)"
-            kill -15 "$pid"
-          else
-            echo "VoiceOver process not found."
-          fi
+      # - name: Terminate VoiceOver
+      #   run: |
+      #     pid=$(pgrep -f "VoiceOver.app/Contents/MacOS/VoiceOver")
+      #     if [ -n "$pid" ]; then
+      #       echo "Terminating VoiceOver (PID: $pid)"
+      #       kill -15 "$pid"
+      #     else
+      #       echo "VoiceOver process not found."
+      #     fi
