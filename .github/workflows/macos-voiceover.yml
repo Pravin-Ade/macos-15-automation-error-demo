@@ -97,6 +97,7 @@ jobs:
           mkdir -p /Users/runner/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
           cd /Users/runner/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
           ls -l
+          pwd
 
       #     # Grant permissions to modify the sandboxed plist location on macOS 15
       #     echo "Granting permissions for plist modification on macOS 15..."
