@@ -98,6 +98,12 @@ jobs:
           cd ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
           pwd
 
+          ls -ltr ~/Library/Preferences/com.apple.VoiceOver4/
+
+          mv -r ~/Library/Preferences/com.apple.VoiceOver4/default.plist ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+          ls -ltr ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+
+
       #     # Grant permissions to modify the sandboxed plist location on macOS 15
       #     echo "Granting permissions for plist modification on macOS 15..."
       #     # Ensure we can modify plist in sandboxed directory
