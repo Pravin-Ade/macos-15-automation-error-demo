@@ -100,7 +100,7 @@ jobs:
 
           ls -ltr ~/Library/Preferences/com.apple.VoiceOver4/
 
-          mv -r ~/Library/Preferences/com.apple.VoiceOver4/default.plist ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+          mv ~/Library/Preferences/com.apple.VoiceOver4/default.plist ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
           ls -ltr ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
 
 
