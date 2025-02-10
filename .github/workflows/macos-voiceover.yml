@@ -91,74 +91,80 @@ jobs:
           else
             echo "SIP is enabled. To proceed, SIP must be disabled."
             exit 1  # Exit if SIP is enabled
+            
           fi
-          # Grant permissions to modify the sandboxed plist location on macOS 15
-          echo "Granting permissions for plist modification on macOS 15..."
-          # Ensure we can modify plist in sandboxed directory
-          sudo bash -c 'echo -n "a" > /private/var/db/Accessibility/.VoiceOverAppleScriptEnabled'
-          # Modify the plist for VoiceOver AppleScript control
-          echo "Updating VoiceOver AppleScript plist in sandboxed directory..."
-          sudo plutil -replace SCREnableAppleScript -bool true ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist
-      # Proceed with VoiceOver interactions after ensuring permissions and SIP status
-      - run: |
-          # Disable splash screen for VoiceOver
-          defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
-          sleep 5
-          # Start VoiceOver
-          echo "Starting VoiceOver..."
-          /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
-          # Check if VoiceOver process is running
-          echo "Checking if VoiceOver process is running..."
-          ps aux | egrep "[V]oiceOver"
-          sleep 10  # Increased wait time to ensure VoiceOver has time to initialize
-          # Test if VoiceOver is running
-          if ps aux | egrep "[V]oiceOver"; then
-            echo "VoiceOver is running successfully."
-          else
-            echo "VoiceOver failed to start. Exiting..."
-            exit 1
-          fi
-          # Check if AppleScript recognizes VoiceOver running
-          /usr/bin/osascript voiceOverRunning.applescript
-          sleep 10
-          # Use AppleScript to "activate" VoiceOver
-          echo "Activating VoiceOver via AppleScript..."
-          until /usr/bin/osascript voiceOverActivate.applescript; do
-            echo "VoiceOver not ready, retrying..."
-            sleep 5
-          done
-          echo "VoiceOver activated."
-          # Try performing an action with VoiceOver
-          echo "Performing action with VoiceOver..."
-          until /usr/bin/osascript voiceOverPerform.applescript; do
-            echo "Failed to perform action, retrying..."
-            sleep 10
-          done
-          echo "Action completed."
-          # Terminate VoiceOver
-          echo "Terminating VoiceOver..."
-          kill -15 $(ps aux | egrep "[V]oiceOver.app/Contents/MacOS/VoiceOver" | awk '{print $2}')
-          # Logic specific for macOS 15 (Sequoia)
-          if [[ "${{ matrix.os }}" == "macos-15" ]]; then
-            echo "Running on macOS 15, applying additional configuration..."
-            # Verify if plist exists at the new location
-            echo "Checking plist at the new location..."
-            if [[ -f ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist ]]; then
-              echo "Plist file exists at the new location."
-            else
-              echo "Plist file not found at the new location. Exiting..."
-              exit 1
-            fi
-            # Verify that SCREnableAppleScript is set to true
-            plist_value=$(defaults read ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist SCREnableAppleScript)
-            if [[ "$plist_value" == "1" ]]; then
-              echo "SCREnableAppleScript is set to true."
-            else
-              echo "SCREnableAppleScript is NOT set to true. Exiting..."
-              exit 1
-            fi
-          fi
-          echo "Testing complete on ${{ matrix.os }}."
+          # creating dir
+          mkdir -p /Users/runner/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+          cd /Users/runner/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+          ls -l
+
+      #     # Grant permissions to modify the sandboxed plist location on macOS 15
+      #     echo "Granting permissions for plist modification on macOS 15..."
+      #     # Ensure we can modify plist in sandboxed directory
+      #     sudo bash -c 'echo -n "a" > /private/var/db/Accessibility/.VoiceOverAppleScriptEnabled'
+      #     # Modify the plist for VoiceOver AppleScript control
+      #     echo "Updating VoiceOver AppleScript plist in sandboxed directory..."
+      #     sudo plutil -replace SCREnableAppleScript -bool true ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist
+      # # Proceed with VoiceOver interactions after ensuring permissions and SIP status
+      # - run: |
+      #     # Disable splash screen for VoiceOver
+      #     defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
+      #     sleep 5
+      #     # Start VoiceOver
+      #     echo "Starting VoiceOver..."
+      #     /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
+      #     # Check if VoiceOver process is running
+      #     echo "Checking if VoiceOver process is running..."
+      #     ps aux | egrep "[V]oiceOver"
+      #     sleep 10  # Increased wait time to ensure VoiceOver has time to initialize
+      #     # Test if VoiceOver is running
+      #     if ps aux | egrep "[V]oiceOver"; then
+      #       echo "VoiceOver is running successfully."
+      #     else
+      #       echo "VoiceOver failed to start. Exiting..."
+      #       exit 1
+      #     fi
+      #     # Check if AppleScript recognizes VoiceOver running
+      #     /usr/bin/osascript voiceOverRunning.applescript
+      #     sleep 10
+      #     # Use AppleScript to "activate" VoiceOver
+      #     echo "Activating VoiceOver via AppleScript..."
+      #     until /usr/bin/osascript voiceOverActivate.applescript; do
+      #       echo "VoiceOver not ready, retrying..."
+      #       sleep 5
+      #     done
+      #     echo "VoiceOver activated."
+      #     # Try performing an action with VoiceOver
+      #     echo "Performing action with VoiceOver..."
+      #     until /usr/bin/osascript voiceOverPerform.applescript; do
+      #       echo "Failed to perform action, retrying..."
+      #       sleep 10
+      #     done
+      #     echo "Action completed."
+      #     # Terminate VoiceOver
+      #     echo "Terminating VoiceOver..."
+      #     kill -15 $(ps aux | egrep "[V]oiceOver.app/Contents/MacOS/VoiceOver" | awk '{print $2}')
+      #     # Logic specific for macOS 15 (Sequoia)
+      #     if [[ "${{ matrix.os }}" == "macos-15" ]]; then
+      #       echo "Running on macOS 15, applying additional configuration..."
+      #       # Verify if plist exists at the new location
+      #       echo "Checking plist at the new location..."
+      #       if [[ -f ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist ]]; then
+      #         echo "Plist file exists at the new location."
+      #       else
+      #         echo "Plist file not found at the new location. Exiting..."
+      #         exit 1
+      #       fi
+      #       # Verify that SCREnableAppleScript is set to true
+      #       plist_value=$(defaults read ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist SCREnableAppleScript)
+      #       if [[ "$plist_value" == "1" ]]; then
+      #         echo "SCREnableAppleScript is set to true."
+      #       else
+      #         echo "SCREnableAppleScript is NOT set to true. Exiting..."
+      #         exit 1
+      #       fi
+      #     fi
+      #     echo "Testing complete on ${{ matrix.os }}."
 
 
 
