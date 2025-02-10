@@ -1,177 +1,177 @@
-# name: MacOS VoiceOver for macOS-15
+name: MacOS VoiceOver for macOS-15
 
-# on: 
-#   workflow_dispatch:
+on: 
+  workflow_dispatch:
 
-# jobs:
-#   start-voiceover-and-move-right:
-#     runs-on: ${{ matrix.os }}
-#     continue-on-error: true
-#     strategy:
-#       matrix:
-#         os: [macos-15, macos-13, macos-14]
-
-#     steps:
-#       # - name: Checkout Repository
-#           run: df -h
-          
-      #   uses: actions/checkout@v3
-
-      # - name: Disable VoiceOver Splash Screen
-      #   run: |
-      #     defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
-      #     echo "Splash screen disabled."
-
-      # - name: Start VoiceOver
-      #   run: |
-      #     /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
-      #     sleep 2
-      #     ps aux | grep "[V]oiceOver" || echo "VoiceOver process not found"
-
-      # - name: Check if VoiceOver is Running
-      #   run: |
-      #     /usr/bin/osascript voiceOverRunning.applescript || echo "AppleScript check failed"
-
-      # - name: Activate VoiceOver
-      #   run: |
-      #     until /usr/bin/osascript voiceOverActivate.applescript; do
-      #       echo "Waiting for VoiceOver activation..."
-      #       sleep 1
-      #     done
-      #     echo "VoiceOver activated."
-
-      # - name: Perform VoiceOver Actions
-      #   run: |
-      #     until /usr/bin/osascript voiceOverPerform.applescript; do
-      #       echo "Failed to perform AppleScript, retrying..."
-      #       sleep 1
-      #     done
-      #     echo "VoiceOver interaction complete."
-
-      # - name: Terminate VoiceOver
-      #   run: |
-      #     pid=$(pgrep -f "VoiceOver.app/Contents/MacOS/VoiceOver")
-      #     if [ -n "$pid" ]; then
-      #       echo "Terminating VoiceOver (PID: $pid)"
-      #       kill -15 "$pid"
-      #     else
-      #       echo "VoiceOver process not found."
-      #     fi
-
-## latest workflow
-
-name: MacOS VoiceOver latest
-on: workflow_dispatch
-  
 jobs:
   start-voiceover-and-move-right:
     runs-on: ${{ matrix.os }}
+    continue-on-error: true
     strategy:
       matrix:
-        os: [macos-13, macos-14, macos-15] 
+        os: [macos-15, macos-13, macos-14]
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Check if AppleScripts and shell scripts are available
-        run: |
-          echo "Checking that AppleScripts and shell scripts are available..."
-          ls voiceOverActivate.applescript
-          ls voiceOverPerform.applescript
-          ls voiceOverRunning.applescript
+      # - name: Checkout Repository
+          run: df -h
           
-      # Ensure System Integrity Protection (SIP) is disabled and modify plist on macOS 15
-      - name: Ensure SIP is disabled and permissions are set on macOS 15
-        if: matrix.os == 'macos-15' 
+        uses: actions/checkout@v3
+
+      - name: Disable VoiceOver Splash Screen
         run: |
-          echo "Checking SIP status..."
-          sip_status=$(csrutil status)
-          echo "SIP Status: $sip_status"
-          # Check if SIP is disabled
-          if [[ "$sip_status" == *"disabled"* ]]; then
-            echo "SIP is already disabled."
-          else
-            echo "SIP is enabled. To proceed, SIP must be disabled."
-            exit 1  # Exit if SIP is enabled
-            
-          fi
-          # creating dir
-          mkdir -p ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-          cd ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-          pwd
-
-          ls -ltr ~/Library/Preferences/com.apple.VoiceOver4/
-
-          mv ~/Library/Preferences/com.apple.VoiceOver4/default.plist ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-          ls -ltr ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-
-
-          # Grant permissions to modify the sandboxed plist location on macOS 15
-          echo "Granting permissions for plist modification on macOS 15..."
-          # Ensure we can modify plist in sandboxed directory
-          sudo bash -c 'echo -n "a" > /private/var/db/Accessibility/.VoiceOverAppleScriptEnabled'
-          # Modify the plist for VoiceOver AppleScript control
-          echo "Updating VoiceOver AppleScript plist in sandboxed directory..."
-          sudo plutil -replace SCREnableAppleScript -bool true ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist
-      # Proceed with VoiceOver interactions after ensuring permissions and SIP status
-      - run: |
-          # Disable splash screen for VoiceOver
           defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
-          sleep 5
-          # Start VoiceOver
-          echo "Starting VoiceOver..."
+          echo "Splash screen disabled."
+
+      - name: Start VoiceOver
+        run: |
           /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
-          # Check if VoiceOver process is running
-          echo "Checking if VoiceOver process is running..."
-          ps aux | egrep "[V]oiceOver"
-          sleep 10  # Increased wait time to ensure VoiceOver has time to initialize
-          # Test if VoiceOver is running
-          if ps aux | egrep "[V]oiceOver"; then
-            echo "VoiceOver is running successfully."
-          else
-            echo "VoiceOver failed to start. Exiting..."
-            exit 1
-          fi
-          # Check if AppleScript recognizes VoiceOver running
-          /usr/bin/osascript voiceOverRunning.applescript
-          sleep 10
-          # Use AppleScript to "activate" VoiceOver
-          echo "Activating VoiceOver via AppleScript..."
+          sleep 2
+          ps aux | grep "[V]oiceOver" || echo "VoiceOver process not found"
+
+      - name: Check if VoiceOver is Running
+        run: |
+          /usr/bin/osascript voiceOverRunning.applescript || echo "AppleScript check failed"
+
+      - name: Activate VoiceOver
+        run: |
           until /usr/bin/osascript voiceOverActivate.applescript; do
-            echo "VoiceOver not ready, retrying..."
-            sleep 5
+            echo "Waiting for VoiceOver activation..."
+            sleep 1
           done
           echo "VoiceOver activated."
-          # Try performing an action with VoiceOver
-          echo "Performing action with VoiceOver..."
+
+      - name: Perform VoiceOver Actions
+        run: |
           until /usr/bin/osascript voiceOverPerform.applescript; do
-            echo "Failed to perform action, retrying..."
-            sleep 10
+            echo "Failed to perform AppleScript, retrying..."
+            sleep 1
           done
-          
-          echo "Action completed."
-          # Terminate VoiceOver
-          echo "Terminating VoiceOver..."
-          kill -15 $(ps aux | egrep "[V]oiceOver.app/Contents/MacOS/VoiceOver" | awk '{print $2}')
-          # Logic specific for macOS 15 (Sequoia)
-          if [[ "${{ matrix.os }}" == "macos-15" ]]; then
-            echo "Running on macOS 15, applying additional configuration..."
-            # Verify if plist exists at the new location
-            echo "Checking plist at the new location..."
-            if [[ -f ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist ]]; then
-              echo "Plist file exists at the new location."
-            else
-              echo "Plist file not found at the new location. Exiting..."
-              exit 1
-            fi
-            # Verify that SCREnableAppleScript is set to true
-            plist_value=$(defaults read ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist SCREnableAppleScript)
-            if [[ "$plist_value" == "1" ]]; then
-              echo "SCREnableAppleScript is set to true."
-            else
-              echo "SCREnableAppleScript is NOT set to true. Exiting..."
-              exit 1
-            fi
+          echo "VoiceOver interaction complete."
+
+      - name: Terminate VoiceOver
+        run: |
+          pid=$(pgrep -f "VoiceOver.app/Contents/MacOS/VoiceOver")
+          if [ -n "$pid" ]; then
+            echo "Terminating VoiceOver (PID: $pid)"
+            kill -15 "$pid"
+          else
+            echo "VoiceOver process not found."
           fi
-          echo "Testing complete on ${{ matrix.os }}."
+
+## latest workflow
+
+# name: MacOS VoiceOver latest
+# on: workflow_dispatch
+  
+# jobs:
+#   start-voiceover-and-move-right:
+#     runs-on: ${{ matrix.os }}
+#     strategy:
+#       matrix:
+#         os: [macos-13, macos-14, macos-15] 
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: Check if AppleScripts and shell scripts are available
+#         run: |
+#           echo "Checking that AppleScripts and shell scripts are available..."
+#           ls voiceOverActivate.applescript
+#           ls voiceOverPerform.applescript
+#           ls voiceOverRunning.applescript
+          
+#       # Ensure System Integrity Protection (SIP) is disabled and modify plist on macOS 15
+#       - name: Ensure SIP is disabled and permissions are set on macOS 15
+#         if: matrix.os == 'macos-15' 
+#         run: |
+#           echo "Checking SIP status..."
+#           sip_status=$(csrutil status)
+#           echo "SIP Status: $sip_status"
+#           # Check if SIP is disabled
+#           if [[ "$sip_status" == *"disabled"* ]]; then
+#             echo "SIP is already disabled."
+#           else
+#             echo "SIP is enabled. To proceed, SIP must be disabled."
+#             exit 1  # Exit if SIP is enabled
+            
+#           fi
+#           # creating dir
+#           mkdir -p ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+#           cd ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+#           pwd
+
+#           ls -ltr ~/Library/Preferences/com.apple.VoiceOver4/
+
+#           mv ~/Library/Preferences/com.apple.VoiceOver4/default.plist ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+#           ls -ltr ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+
+
+#           # Grant permissions to modify the sandboxed plist location on macOS 15
+#           echo "Granting permissions for plist modification on macOS 15..."
+#           # Ensure we can modify plist in sandboxed directory
+#           sudo bash -c 'echo -n "a" > /private/var/db/Accessibility/.VoiceOverAppleScriptEnabled'
+#           # Modify the plist for VoiceOver AppleScript control
+#           echo "Updating VoiceOver AppleScript plist in sandboxed directory..."
+#           sudo plutil -replace SCREnableAppleScript -bool true ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist
+#       # Proceed with VoiceOver interactions after ensuring permissions and SIP status
+#       - run: |
+#           # Disable splash screen for VoiceOver
+#           defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
+#           sleep 5
+#           # Start VoiceOver
+#           echo "Starting VoiceOver..."
+#           /System/Library/CoreServices/VoiceOver.app/Contents/MacOS/VoiceOverStarter &
+#           # Check if VoiceOver process is running
+#           echo "Checking if VoiceOver process is running..."
+#           ps aux | egrep "[V]oiceOver"
+#           sleep 10  # Increased wait time to ensure VoiceOver has time to initialize
+#           # Test if VoiceOver is running
+#           if ps aux | egrep "[V]oiceOver"; then
+#             echo "VoiceOver is running successfully."
+#           else
+#             echo "VoiceOver failed to start. Exiting..."
+#             exit 1
+#           fi
+#           # Check if AppleScript recognizes VoiceOver running
+#           /usr/bin/osascript voiceOverRunning.applescript
+#           sleep 10
+#           # Use AppleScript to "activate" VoiceOver
+#           echo "Activating VoiceOver via AppleScript..."
+#           until /usr/bin/osascript voiceOverActivate.applescript; do
+#             echo "VoiceOver not ready, retrying..."
+#             sleep 5
+#           done
+#           echo "VoiceOver activated."
+#           # Try performing an action with VoiceOver
+#           echo "Performing action with VoiceOver..."
+#           until /usr/bin/osascript voiceOverPerform.applescript; do
+#             echo "Failed to perform action, retrying..."
+#             sleep 10
+#           done
+          
+#           echo "Action completed."
+#           # Terminate VoiceOver
+#           echo "Terminating VoiceOver..."
+#           kill -15 $(ps aux | egrep "[V]oiceOver.app/Contents/MacOS/VoiceOver" | awk '{print $2}')
+#           # Logic specific for macOS 15 (Sequoia)
+#           if [[ "${{ matrix.os }}" == "macos-15" ]]; then
+#             echo "Running on macOS 15, applying additional configuration..."
+#             # Verify if plist exists at the new location
+#             echo "Checking plist at the new location..."
+#             if [[ -f ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist ]]; then
+#               echo "Plist file exists at the new location."
+#             else
+#               echo "Plist file not found at the new location. Exiting..."
+#               exit 1
+#             fi
+#             # Verify that SCREnableAppleScript is set to true
+#             plist_value=$(defaults read ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/default.plist SCREnableAppleScript)
+#             if [[ "$plist_value" == "1" ]]; then
+#               echo "SCREnableAppleScript is set to true."
+#             else
+#               echo "SCREnableAppleScript is NOT set to true. Exiting..."
+#               exit 1
+#             fi
+#           fi
+#           echo "Testing complete on ${{ matrix.os }}."
 
 
 
