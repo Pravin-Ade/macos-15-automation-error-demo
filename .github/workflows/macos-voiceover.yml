@@ -94,9 +94,8 @@ jobs:
             
           fi
           # creating dir
-          mkdir -p /Users/runner/Library/Group\Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-          cd /Users/runner/Library/Group Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
-          ls -l
+          mkdir -p ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+          cd ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
           pwd
 
       #     # Grant permissions to modify the sandboxed plist location on macOS 15
