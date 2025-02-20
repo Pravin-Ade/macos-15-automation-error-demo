@@ -1,4 +1,4 @@
-delay 2
+delay 1
 
 with timeout of 30 seconds
   tell application "VoiceOver"
