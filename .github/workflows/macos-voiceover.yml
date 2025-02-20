@@ -8,10 +8,14 @@ jobs:
     continue-on-error: true
     strategy:
       matrix:
-        os: [macos-13, macos-13-large, macos-14, macos-14-xlarge, macos-14-large, macos-15-large, macos-15-xlarge]
+        # os: [macos-13, macos-13-large, macos-14, macos-14-xlarge, macos-14-large, macos-15-large, macos-15-xlarge]
+        os: [macos-15, macos-15-large]
     steps:
       - uses: actions/checkout@v3
       - run: |
+          ls -ltr /private/var/db/Accessibility/ | grep -i .VoiceOverAppleScriptEnabled
+          ls -l ~/Library/Group\ Containers/group.com.apple.VoiceOver/Library/Preferences/com.apple.VoiceOver4/
+          
           # Disable splash screen
           defaults write com.apple.VoiceOverTraining doNotShowSplashScreen -bool true
           sleep 1
